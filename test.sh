@@ -1,5 +1,11 @@
 #!/bin/sh
 
+trap cleanup EXIT
+
+cleanup() {
+    rm tmp tmp.s
+}
+
 assert() {
     expected="$1"
     input="$2"
@@ -17,7 +23,11 @@ assert() {
     echo "$input => $actual"
 }
 
-assert 0 0
-assert 42 42
+main() {
+    assert 0 0
+    assert 42 42
 
-echo OK
+    echo OK
+}
+
+main
