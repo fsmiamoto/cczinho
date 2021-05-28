@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Werror -static
+CFLAGS = -Wall -Werror -static -std=c11
 
 BIN = czinho
 SRC = *.c
