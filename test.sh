@@ -1,18 +1,21 @@
 #!/bin/sh
 
+TEMP_ASM="$(mktemp -u --suffix=.s)"
+TEMP_BIN="$(mktemp -u)"
+
 trap cleanup EXIT
 
 cleanup() {
-    rm tmp tmp.s
+    rm "$TEMP_BIN" "$TEMP_ASM"
 }
 
 assert() {
     expected="$1"
     input="$2"
 
-    ./czinho "$input" > tmp.s
-    clang -o tmp tmp.s
-    ./tmp
+    ./$BIN "$input" > "$TEMP_ASM"
+    $CC -o "$TEMP_BIN" "$TEMP_ASM"
+    "$TEMP_BIN"
     actual="$?"
 
     if [ "$actual" -ne "$expected" ]; then
@@ -24,8 +27,7 @@ assert() {
 }
 
 main() {
-    assert 0 0
-    assert 42 42
+    assert 21  '5+20-4'
 
     echo OK
 }

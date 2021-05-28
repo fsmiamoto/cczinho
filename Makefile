@@ -8,7 +8,7 @@ $(BIN): $(SRC)
 	$(CC) $(CFLAGS) $< -o $(BIN)
 
 test: $(BIN)
-	./test.sh
+	BIN=$(BIN) CC=$(CC) ./test.sh
 
 clean:
 	$(RM) $(BIN) *.o *~ tmp*
