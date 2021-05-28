@@ -19,17 +19,16 @@ assert() {
     actual="$?"
 
     if [ "$actual" -ne "$expected" ]; then
-        echo "$input => $expected expected, but got $actual"
+        echo "FAIL: $input => $expected expected, but got $actual"
         exit 1;
     fi
 
-    echo "$input => $actual"
+    echo "PASS: $input => $actual"
 }
 
 main() {
-    assert 21  '5+20-4'
-
-    echo OK
+    assert 21 '5+20-4'
+    assert 42 '40+2'
 }
 
 main
