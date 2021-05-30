@@ -1,8 +1,8 @@
 CC = clang
 CFLAGS = -Wall -Wextra -Werror -static -std=c11
 
-BIN = czinho
-SRC = *.c
+BIN = cczinho
+SRC = $(wildcard *.c)
 
 $(BIN): $(SRC)
 	$(CC) $(CFLAGS) $< -o $(BIN)
