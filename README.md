@@ -1,9 +1,9 @@
 # cczinho
 
-Follow along of the compiler built at https://www.sigbus.info/compilerbook
+My implementation of the compiler built at https://www.sigbus.info/compilerbook
 
 ## Running tests
 ```sh
-$ make
+$ make test
 ```
 
