@@ -20,12 +20,28 @@ struct Token {
   char *str;
 };
 
+//  プログラム入力
+char *input;
+
 // 現在着目しているトークン
 Token *token;
 
 void error(char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  fprintf(stderr, "\n");
+  exit(1);
+}
+
+void error_at(char *loc, char *fmt, ...) {
+  va_list ap;
+  va_start(ap, fmt);
+
+  int position = loc - input;
+  fprintf(stderr, "%s\n", input);
+  fprintf(stderr, "%*s", position, "");
+  fprintf(stderr, "^ ");
   vfprintf(stderr, fmt, ap);
   fprintf(stderr, "\n");
   exit(1);
@@ -41,13 +57,13 @@ bool consume(char op) {
 
 void expect(char op) {
   if (token->kind != TK_RESERVED || token->str[0] != op)
-    error("'%c' was expected, found '%c'", op, token->str);
+    error_at(token->str, "'%c' was expected, found '%c'", op, token->str);
   token = token->next;
 }
 
 int expect_number() {
   if (token->kind != TK_NUM) {
-    error("token is not a number");
+    error_at(token->str, "token is not a number");
   }
   int val = token->val;
   token = token->next;
@@ -64,11 +80,12 @@ Token *new_token(TokenKind kind, Token *cur, char *str) {
   return tok;
 }
 
-Token *tokenize(char *p) {
+Token *tokenize() {
   Token head;
   head.next = NULL;
   Token *curr = &head;
 
+  char *p = input;
   while (*p) {
     if (isspace(*p)) {
       p++;
@@ -86,7 +103,7 @@ Token *tokenize(char *p) {
       continue;
     }
 
-    error("unexpected token found: '%c'", p);
+    error_at(p, "unexpected token found: '%c'", p);
   }
 
   new_token(TK_EOF, curr, p);
@@ -99,7 +116,8 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  token = tokenize(argv[1]);
+  input = argv[1];
+  token = tokenize();
 
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
@@ -110,11 +128,9 @@ int main(int argc, char **argv) {
   while (!at_eof()) {
     if (consume('+')) {
       printf("  add rax, %d\n", expect_number());
-      continue;
+    } else if (consume('-')) {
+      printf("  sub rax, %d\n", expect_number());
     }
-
-    expect('-');
-    printf("  sub rax, %d\n", expect_number());
   }
 
   printf("  ret\n");
