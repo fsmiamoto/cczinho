@@ -4,19 +4,19 @@ CFLAGS = -Wall -Wextra -Werror -static -std=c11
 BIN = cczinho
 SRC = $(wildcard *.c)
 
-%.debug: $(SRC)
+$(BIN): $(SRC)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BIN).debug: $(SRC)
 	$(CC) $(CFLAGS) -g $< -o $@
 
-%: $(SRC)
-	$(CC) $(CFLAGS) $< -o $(BIN)
-
-test: $(BIN)
+test: $(BIN) # run tests
 	@BIN=$(BIN) CC=$(CC) ./test.sh
 
 clean:
-	$(RM) $(BIN) *.o *~ tmp*
+	$(RM) $(BIN) *.o *~ tmp* $(BIN).debug
 
 debug: $(BIN).debug
-	gdb -tui "$(BIN).debug"
+	gdb -tui $(BIN).debug
 
-.PHONY: test clean
+.PHONY: test clean debug

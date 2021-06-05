@@ -30,6 +30,7 @@ main() {
     assert 21 '5+20-4'
     assert 42 '40+2'
     assert 4 '3 + 1'
+    assert 15 '12 + 5 - 2'
 }
 
 main
