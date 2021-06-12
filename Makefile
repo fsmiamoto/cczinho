@@ -7,10 +7,10 @@ BIN = cczinho
 SRCDIR = ./src
 SRC = $(wildcard $(SRCDIR)/*.c)
 
-$(BINDIR)/$(BIN): $(BINDIR)
+$(BINDIR)/$(BIN): $(SRC) $(BINDIR)
 	$(CC) $(CFLAGS) $(SRC) -o $@
 
-$(BINDIR)/$(BIN).debug: $(BINDIR)
+$(BINDIR)/$(BIN).debug: $(SRC) $(BINDIR)
 	$(CC) $(CFLAGS) -g $(SRC) -o $@
 
 $(BINDIR):

@@ -74,7 +74,7 @@ Token *tokenize() {
       continue;
     }
 
-    if (*p == '+' || *p == '-') {
+    if (strchr("+-*/()", *p)) {
       curr = new_token(TK_RESERVED, curr, p++);
       continue;
     }
@@ -92,6 +92,78 @@ Token *tokenize() {
   return head.next;
 }
 
+// expr = mul ("+" mul | "-" mul)*
+Node *expr() {
+  Node *node = mul();
+
+  for (;;) {
+    if (consume('+'))
+      node = new_node(ND_ADD, node, mul());
+    else if (consume('-'))
+      node = new_node(ND_SUB, node, mul());
+    else
+      return node;
+  }
+}
+
+// mul = primary | ("*" primary | "/" primary)*
+Node *mul() {
+  Node *node = primary();
+
+  for (;;) {
+    if (consume('*'))
+      node = new_node(ND_MUL, node, primary());
+    else if (consume('/'))
+      node = new_node(ND_DIV, node, primary());
+    else
+      return node;
+  }
+}
+
+// primary = num | "(" expr ")"
+Node *primary() {
+  if (consume('(')) {
+    Node *node = expr();
+    expect(')');
+    return node;
+  }
+
+  return new_node_num(expect_number());
+}
+
+void gen(Node *node) {
+  if (node->kind == ND_NUM) {
+    printf("  push %d\n", node->val);
+    return;
+  }
+
+  gen(node->lhs);
+  gen(node->rhs);
+
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
+
+  switch (node->kind) {
+  case ND_ADD:
+    printf("  add rax, rdi\n");
+    break;
+  case ND_SUB:
+    printf("  sub rax, rdi\n");
+    break;
+  case ND_MUL:
+    printf("  imul rax, rdi\n");
+    break;
+  case ND_DIV:
+    printf("  cqo\n");
+    printf("  idiv rdi\n");
+    break;
+  default:
+    break;
+  }
+
+  printf("  push rax\n");
+}
+
 int main(int argc, char **argv) {
   if (argc != 2) {
     fprintf(stderr, "missing arguments\n");
@@ -100,21 +172,15 @@ int main(int argc, char **argv) {
 
   input = argv[1];
   token = tokenize();
+  Node *node = expr();
 
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
   printf("main:\n");
 
-  printf("  mov rax, %d\n", expect_number());
+  gen(node);
 
-  while (!at_eof()) {
-    if (consume('+')) {
-      printf("  add rax, %d\n", expect_number());
-    } else if (consume('-')) {
-      printf("  sub rax, %d\n", expect_number());
-    }
-  }
-
+  printf("  pop rax\n");
   printf("  ret\n");
   return 0;
 }
