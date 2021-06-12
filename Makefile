@@ -1,22 +1,28 @@
-CC = clang
+CC = gcc
 CFLAGS = -Wall -Wextra -Werror -static -std=c11
 
+BINDIR = ./bin
 BIN = cczinho
-SRC = $(wildcard *.c)
 
-$(BIN): $(SRC)
+SRCDIR = ./src
+SRC = $(wildcard $(SRCDIR)/*.c)
+
+$(BINDIR)/$(BIN): $(SRC) $(BINDIR)
 	$(CC) $(CFLAGS) $< -o $@
 
-$(BIN).debug: $(SRC)
+$(BINDIR)/$(BIN).debug: $(SRC) $(BINDIR)
 	$(CC) $(CFLAGS) -g $< -o $@
 
-test: $(BIN) # run tests
-	@BIN=$(BIN) CC=$(CC) ./test.sh
+$(BINDIR):
+	@mkdir -p $(BINDIR)
+
+test: $(BINDIR)/$(BIN) # run tests
+	@BIN=$(BINDIR)/$(BIN) CC=$(CC) ./test.sh
 
 clean:
-	$(RM) $(BIN) *.o *~ tmp* $(BIN).debug
+	$(RM) -rf $(BINDIR) *.o *~ tmp*
 
-debug: $(BIN).debug
-	gdb -tui $(BIN).debug
+debug: $(BINDIR)/$(BIN).debug
+	gdb -tui $(BINDIR)/$(BIN).debug
 
 .PHONY: test clean debug
