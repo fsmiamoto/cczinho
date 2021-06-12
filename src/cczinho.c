@@ -1,3 +1,5 @@
+#include "error.h"
+#include "node.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -26,27 +28,6 @@ char *input;
 // 現在着目しているトークン
 Token *token;
 
-void error(char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\n");
-  exit(1);
-}
-
-void error_at(char *loc, char *fmt, ...) {
-  va_list ap;
-  va_start(ap, fmt);
-
-  int position = loc - input;
-  fprintf(stderr, "%s\n", input);
-  fprintf(stderr, "%*s", position, "");
-  fprintf(stderr, "^ ");
-  vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\n");
-  exit(1);
-}
-
 bool consume(char op) {
   if (token->kind != TK_RESERVED || token->str[0] != op) {
     return false;
@@ -57,13 +38,14 @@ bool consume(char op) {
 
 void expect(char op) {
   if (token->kind != TK_RESERVED || token->str[0] != op)
-    error_at(token->str, "'%c' was expected, found '%c'", op, token->str);
+    error_at(input, token->str, "'%c' was expected, found '%c'", op,
+             token->str);
   token = token->next;
 }
 
 int expect_number() {
   if (token->kind != TK_NUM) {
-    error_at(token->str, "token is not a number");
+    error_at(input, token->str, "token is not a number");
   }
   int val = token->val;
   token = token->next;
@@ -103,7 +85,7 @@ Token *tokenize() {
       continue;
     }
 
-    error_at(p, "unexpected token found: '%c'", p);
+    error_at(input, p, "unexpected token found: '%c'", p);
   }
 
   new_token(TK_EOF, curr, p);
