@@ -7,6 +7,12 @@ typedef enum {
   ND_MUL, // *
   ND_DIV, // *
   ND_NUM, // integer
+  ND_EQ,  // ==
+  ND_NEQ, // !=
+  ND_LT,  // <
+  ND_LTE, // <=
+  ND_GT,  // >
+  ND_GTE, // >=
 } NodeKind;
 
 typedef struct Node Node;
@@ -25,4 +31,7 @@ Node *expr();
 Node *mul();
 Node *primary();
 Node *unary();
+Node *add();
+Node *relational();
+Node *equality();
 #endif
