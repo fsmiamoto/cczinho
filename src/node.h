@@ -29,6 +29,7 @@ struct Node {
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
+Node *new_node_lvar(char *ident);
 
 Node *expr();
 Node *mul();

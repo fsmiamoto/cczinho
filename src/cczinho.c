@@ -138,14 +138,17 @@ void program() {
   code[i] = NULL;
 }
 
+// stmt = expr ";"
 Node *stmt() {
   Node *node = expr();
   expect(";");
   return node;
 }
 
+// expr = assign
 Node *expr() { return assign(); }
 
+// assign = equality ("=" assign)?
 Node *assign() {
   Node *node = equality();
 
@@ -156,6 +159,7 @@ Node *assign() {
   return node;
 }
 
+// equality = relational ("==" relational | "!=" relational)*
 Node *equality() {
   Node *node = relational();
 
@@ -224,7 +228,7 @@ Node *unary() {
   return primary();
 }
 
-// primary = num | "(" expr ")"
+// primary = num | ident | "(" expr ")"
 Node *primary() {
   if (consume("(")) {
     Node *node = expr();
@@ -232,12 +236,9 @@ Node *primary() {
     return node;
   }
 
-  Token *tok = consume_ident();
-  if (tok) {
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_LVAR;
-    node->offset = (tok->str[0] - 'a' + 1) * 8;
-    return node;
+  Token *tok;
+  if ((tok = consume_ident())) {
+    return new_node_lvar(tok->str);
   }
 
   return new_node_num(expect_number());
