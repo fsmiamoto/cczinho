@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   // Prologue
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, 208\n"); // 26 positions of 8 bytes
 
   for (int i = 0; code[i]; i++) {
     gen(code[i]);
@@ -45,6 +45,7 @@ int main(int argc, char **argv) {
     printf("  pop rax\n");
   }
 
+  // Epilogue
   printf("  mov rsp, rbp\n");
   printf("  pop rbp\n");
   printf("  ret\n");
