@@ -27,6 +27,8 @@ struct Node {
   int offset;
 };
 
+extern Node *code[100];
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
 Node *new_node_lvar(char *ident);

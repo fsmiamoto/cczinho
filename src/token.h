@@ -1,6 +1,8 @@
 #ifndef __TOKEN__H
 #define __TOKEN__H
 
+#include <stdbool.h>
+
 typedef enum {
     TK_RESERVED,
     TK_IDENT,
