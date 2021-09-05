@@ -9,6 +9,7 @@
 
 typedef enum {
   TK_RESERVED,
+  TK_IDENT,
   TK_NUM,
   TK_EOF,
 } TokenKind;
@@ -38,12 +39,28 @@ bool consume(char *op) {
   return true;
 }
 
+Token *consume_ident() {
+  if (token->kind != TK_IDENT)
+    return NULL;
+  Token *ident = token;
+  token = token->next;
+  return ident;
+}
+
 void expect(char *op) {
   if (token->kind != TK_RESERVED || (int)strlen(op) != token->len ||
       memcmp(token->str, op, token->len))
-    error_at(input, token->str, "'%c' was expected, found '%c'", op,
+    error_at(input, token->str, "'%s' was expected, found '%c'", op,
              token->str);
   token = token->next;
+}
+
+char *expect_ident() {
+  if (token->kind != TK_IDENT)
+    error_at(input, token->str, "expected an identifier");
+  char *ident = token->str;
+  token = token->next;
+  return ident;
 }
 
 int expect_number() {
@@ -87,7 +104,7 @@ Token *tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<>", *p)) {
+    if (strchr("+-*/()<>;=", *p)) {
       curr = new_token(TK_RESERVED, curr, p++, 1);
       continue;
     }
@@ -100,6 +117,11 @@ Token *tokenize() {
       continue;
     }
 
+    if ('a' <= *p && *p <= 'z') {
+      curr = new_token(TK_IDENT, curr, p++, 1);
+      continue;
+    }
+
     error_at(input, p, "unexpected token found: '%c'", p);
   }
 
@@ -107,7 +129,32 @@ Token *tokenize() {
   return head.next;
 }
 
-Node *expr() { return equality(); }
+Node *code[100];
+
+void program() {
+  int i = 0;
+  while (!at_eof())
+    code[i++] = stmt();
+  code[i] = NULL;
+}
+
+Node *stmt() {
+  Node *node = expr();
+  expect(";");
+  return node;
+}
+
+Node *expr() { return assign(); }
+
+Node *assign() {
+  Node *node = equality();
+
+  if (consume("=")) {
+    node = new_node(ND_ASSIGN, node, assign());
+  }
+
+  return node;
+}
 
 Node *equality() {
   Node *node = relational();
@@ -185,13 +232,48 @@ Node *primary() {
     return node;
   }
 
+  Token *tok = consume_ident();
+  if (tok) {
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+    node->offset = (tok->str[0] - 'a' + 1) * 8;
+    return node;
+  }
+
   return new_node_num(expect_number());
 }
 
+void gen_lval(Node *node) {
+  if (node->kind != ND_LVAR)
+    error("left side of assignment is not a variable");
+
+  printf("  mov rax, rbp\n");
+  printf("  sub rax, %d\n", node->offset);
+  printf("  push rax\n");
+}
+
 void gen(Node *node) {
-  if (node->kind == ND_NUM) {
+  switch (node->kind) {
+  case ND_NUM:
     printf("  push %d\n", node->val);
     return;
+  case ND_LVAR:
+    gen_lval(node);
+    printf("  pop rax\n");
+    printf("  mov rax, [rax]\n");
+    printf("  push rax\n");
+    return;
+  case ND_ASSIGN:
+    gen_lval(node->lhs);
+    gen(node->rhs);
+
+    printf("  pop rdi\n");
+    printf("  pop rax\n");
+    printf("  mov [rax], rdi\n");
+    printf("  push rdi\n");
+    return;
+  default:
+    break;
   }
 
   gen(node->lhs);
@@ -259,15 +341,27 @@ int main(int argc, char **argv) {
 
   input = argv[1];
   token = tokenize();
-  Node *node = expr();
+  program();
 
   printf(".intel_syntax noprefix\n");
   printf(".globl main\n");
   printf("main:\n");
 
-  gen(node);
+  // Prologue
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
 
-  printf("  pop rax\n");
+  for (int i = 0; code[i]; i++) {
+    gen(code[i]);
+
+    // 式の評価結果としてスタックに一つの値が残っている
+    // はずなので、スタックが溢れないようにポップしておく
+    printf("  pop rax\n");
+  }
+
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
   printf("  ret\n");
   return 0;
 }
