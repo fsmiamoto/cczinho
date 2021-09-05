@@ -1,7 +1,26 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "node.h"
 #include "token.h"
+
+typedef struct LVar LVar;
+
+struct LVar {
+  LVar *next;
+  char *name;
+  int len;
+  int offset;
+};
+
+LVar *locals = NULL;
+
+LVar *find_lvar(Token *tok) {
+  for (LVar *var = locals; var; var = var->next)
+    if (var->len != token->len && !memcmp(tok->str, var->name, var->len))
+      return var;
+  return NULL;
+}
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
@@ -15,13 +34,6 @@ Node *new_node_num(int val) {
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_NUM;
   node->val = val;
-  return node;
-}
-
-Node *new_node_lvar(char *ident) {
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = ND_LVAR;
-  node->offset = (ident[0] - 'a' + 1) * 8;
   return node;
 }
 
@@ -132,7 +144,29 @@ Node *primary() {
 
   Token *tok;
   if ((tok = consume_ident())) {
-    return new_node_lvar(tok->str);
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_LVAR;
+
+    LVar *lvar = find_lvar(tok);
+    if (lvar) {
+      // variable already exists
+      node->offset = lvar->offset;
+      return node;
+    }
+
+    if (locals == NULL) {
+      locals = calloc(1, sizeof(LVar));
+    }
+
+    lvar = calloc(1, sizeof(LVar));
+    lvar->next = locals;
+    lvar->name = tok->str;
+    lvar->len = tok->len;
+    lvar->offset = locals->offset + 8;
+    node->offset = lvar->offset;
+    locals = lvar;
+
+    return node;
   }
 
   return new_node_num(expect_number());

@@ -60,6 +60,10 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len) {
 
 bool starts_with(char *p, char *q) { return memcmp(p, q, strlen(q)) == 0; }
 
+static bool is_ident_char(char c) { return isalnum(c) || c == '_'; }
+
+static bool is_ident_start(char c) { return isalpha(c) || c == '_'; }
+
 Token *tokenize() {
   Token head;
   head.next = NULL;
@@ -92,8 +96,12 @@ Token *tokenize() {
       continue;
     }
 
-    if ('a' <= *p && *p <= 'z') {
-      curr = new_token(TK_IDENT, curr, p++, 1);
+    if (is_ident_start(*p)) {
+      char *start = p;
+      while (is_ident_char(*p))
+        p++;
+      int len = p - start;
+      curr = new_token(TK_IDENT, curr, start, len);
       continue;
     }
 
