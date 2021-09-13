@@ -14,6 +14,14 @@ bool consume(char *op) {
   return true;
 }
 
+Token *consume_token(TokenKind kind) {
+  if (token->kind != kind)
+    return NULL;
+  Token *t = token;
+  token = token->next;
+  return t;
+}
+
 Token *consume_ident() {
   if (token->kind != TK_IDENT)
     return NULL;
@@ -96,6 +104,12 @@ Token *tokenize() {
       continue;
     }
 
+    if (strncmp(p, "return", 6) == 0 && !isalnum(p[6])) {
+      curr = new_token(TK_RETURN, curr, p, 6);
+      p += 6;
+      continue;
+    }
+
     if (is_ident_start(*p)) {
       char *start = p;
       while (is_ident_char(*p))
@@ -105,7 +119,7 @@ Token *tokenize() {
       continue;
     }
 
-    error_at(input, p, "unexpected token found: '%c'", p);
+    error_at(input, p, "unexpected token found: '%c'", *p);
   }
 
   new_token(TK_EOF, curr, p, 0);

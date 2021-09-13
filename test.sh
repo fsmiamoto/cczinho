@@ -67,6 +67,16 @@ main() {
 
     assert 1 'b=1;'
     assert 3 'a=b=3;'
+
+    assert 42 'foo=42;'
+    assert 42 '_start_with_underscore=42;'
+    assert 15 'with_digits_13=15;'
+    assert 15 'a=5;b=15;'
+    assert 5 'a=5;a=5;'
+
+    assert 7 'return 7;';
+    assert 5 'a=1; b=9; return 5*a;'
+    assert 46 'a=1; b=9; return 5*b + a;'
 }
 
 main

@@ -17,7 +17,7 @@ LVar *locals = NULL;
 
 LVar *find_lvar(Token *tok) {
   for (LVar *var = locals; var; var = var->next)
-    if (var->len != token->len && !memcmp(tok->str, var->name, var->len))
+    if (var->len == token->len && !memcmp(tok->str, var->name, var->len))
       return var;
   return NULL;
 }
@@ -44,10 +44,21 @@ void program() {
   code[i] = NULL;
 }
 
-// stmt = expr ";"
+// stmt = expr ";" | "return" expr ";"
 Node *stmt() {
-  Node *node = expr();
+  Node *node;
+  Token *tok;
+
+  if ((tok = consume_token(TK_RETURN))) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_RETURN;
+    node->lhs = expr();
+  } else {
+    node = expr();
+  }
+
   expect(";");
+
   return node;
 }
 
@@ -143,7 +154,7 @@ Node *primary() {
   }
 
   Token *tok;
-  if ((tok = consume_ident())) {
+  if ((tok = consume_token(TK_IDENT))) {
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_LVAR;
 
@@ -154,7 +165,7 @@ Node *primary() {
       return node;
     }
 
-    if (locals == NULL) {
+    if (!locals) {
       locals = calloc(1, sizeof(LVar));
     }
 

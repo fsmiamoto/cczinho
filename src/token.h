@@ -7,6 +7,7 @@ typedef enum {
     TK_RESERVED,
     TK_IDENT,
     TK_NUM,
+    TK_RETURN,
     TK_EOF,
 } TokenKind;
 
@@ -27,6 +28,7 @@ bool at_eof();
 bool starts_with(char *p, char*q);
 
 bool consume(char *op);
+Token* consume_token(TokenKind k);
 Token* consume_ident();
 
 void expect(char *op);
