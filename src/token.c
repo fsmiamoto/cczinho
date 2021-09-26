@@ -5,6 +5,8 @@
 #include "error.h"
 #include "token.h"
 
+#define LEN(x) (sizeof x - 1)
+
 bool consume(char *op) {
   if (token->kind != TK_RESERVED || (int)strlen(op) != token->len ||
       memcmp(token->str, op, token->len)) {
@@ -104,9 +106,34 @@ Token *tokenize() {
       continue;
     }
 
-    if (strncmp(p, "return", 6) == 0 && !isalnum(p[6])) {
-      curr = new_token(TK_RETURN, curr, p, 6);
-      p += 6;
+    if (strncmp(p, "return", LEN("return")) == 0 &&
+        !isalnum(p[LEN("return")])) {
+      curr = new_token(TK_RETURN, curr, p, LEN("return"));
+      p += LEN("return");
+      continue;
+    }
+
+    if (strncmp(p, "if", LEN("if")) == 0 && !isalnum(p[LEN("if")])) {
+      curr = new_token(TK_IF, curr, p, LEN("if"));
+      p += LEN("if");
+      continue;
+    }
+
+    if (strncmp(p, "else", LEN("else")) == 0 && !isalnum(p[LEN("ELSE")])) {
+      curr = new_token(TK_ELSE, curr, p, LEN("else"));
+      p += LEN("else");
+      continue;
+    }
+
+    if (strncmp(p, "while", LEN("while")) == 0 && !isalnum(p[LEN("while")])) {
+      curr = new_token(TK_WHILE, curr, p, LEN("while"));
+      p += LEN("while");
+      continue;
+    }
+
+    if (strncmp(p, "for", LEN("for")) == 0 && !isalnum(p[LEN("for")])) {
+      curr = new_token(TK_FOR, curr, p, LEN("for"));
+      p += LEN("for");
       continue;
     }
 

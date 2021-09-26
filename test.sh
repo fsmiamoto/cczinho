@@ -17,7 +17,7 @@ assert() {
     ./$BIN "$input" > "$TEMP_ASM"
     if [ $? -ne 0 ]; then
         echo "FAIL: $input => $expected failed to compile"
-        exit 1
+        return
     fi
 
     $CC -o "$TEMP_BIN" "$TEMP_ASM"
@@ -26,7 +26,7 @@ assert() {
 
     if [ "$actual" -ne "$expected" ]; then
         echo "FAIL: $input => $expected expected, but got $actual"
-        exit 1
+        return
     fi
 
     echo "PASS: $input => $actual"
@@ -77,6 +77,12 @@ main() {
     assert 7 'return 7;';
     assert 5 'a=1; b=9; return 5*a;'
     assert 46 'a=1; b=9; return 5*b + a;'
+    assert 1 'a=1; return a == 1;'
+    assert 0 'a=1; return a == 0;'
+    assert 5 'if(1) return 5; return 4;'
+    assert 4 'if(0) return 5; return 4;'
+    assert 5 'if(1) return 5; else return 4;'
+    assert 4 'if(0) return 5; else return 4;'
 }
 
 main

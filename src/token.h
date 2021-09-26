@@ -9,6 +9,10 @@ typedef enum {
     TK_NUM,
     TK_RETURN,
     TK_EOF,
+    TK_IF,
+    TK_ELSE,
+    TK_WHILE,
+    TK_FOR,
 } TokenKind;
 
 typedef struct Token Token;

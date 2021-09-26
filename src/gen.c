@@ -39,6 +39,28 @@ void gen(Node *node) {
     printf("  pop rbp\n");
     printf("  ret\n");
     return;
+  case ND_IF:
+    // TODO: Add unique id for if statements
+    if (node->els) {
+      gen(node->cond);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je .LelseXXX\n");
+      gen(node->body);
+      printf("  jmp .LendXXX\n");
+      printf(".LelseXXX:\n");
+      gen(node->els);
+      printf(".LendXXX:\n");
+      return;
+    }
+
+    gen(node->cond);
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je .LendXXX\n");
+    gen(node->body);
+    printf(".LendXXX:\n");
+    return;
   default:
     break;
   }
