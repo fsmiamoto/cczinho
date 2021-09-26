@@ -3,6 +3,11 @@
 
 #include <stdio.h>
 
+static int count(void) {
+  static int i = 1;
+  return i++;
+}
+
 void gen_lval(Node *node) {
   if (node->kind != ND_LVAR)
     error("left side of assignment is not a variable");
@@ -40,17 +45,18 @@ void gen(Node *node) {
     printf("  ret\n");
     return;
   case ND_IF:
-    // TODO: Add unique id for if statements
+    int c = count();
+
     if (node->els) {
       gen(node->cond);
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
-      printf("  je .LelseXXX\n");
+      printf("  je .Lelse.%d\n", c);
       gen(node->body);
-      printf("  jmp .LendXXX\n");
-      printf(".LelseXXX:\n");
+      printf("  jmp .Lend.%d\n", c);
+      printf(".Lelse.%d:\n", c);
       gen(node->els);
-      printf(".LendXXX:\n");
+      printf(".Lend.%d:\n", c);
       return;
     }
 
