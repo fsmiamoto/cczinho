@@ -27,7 +27,7 @@ struct Node {
   Node *rhs;
   Node *els;
   Node *cond;
-  Node *body;
+  Node *then;
   int val;
   int offset;
 };

@@ -65,7 +65,7 @@ Node *stmt() {
     expect("(");
     node->cond = expr();
     expect(")");
-    node->body = stmt();
+    node->then = stmt();
     if ((tok = consume_token(TK_ELSE))) {
       node->els = stmt();
     }

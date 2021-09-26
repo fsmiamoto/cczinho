@@ -52,7 +52,7 @@ void gen(Node *node) {
       printf("  pop rax\n");
       printf("  cmp rax, 0\n");
       printf("  je .Lelse.%d\n", c);
-      gen(node->body);
+      gen(node->then);
       printf("  jmp .Lend.%d\n", c);
       printf(".Lelse.%d:\n", c);
       gen(node->els);
@@ -64,7 +64,7 @@ void gen(Node *node) {
     printf("  pop rax\n");
     printf("  cmp rax, 0\n");
     printf("  je .LendXXX\n");
-    gen(node->body);
+    gen(node->then);
     printf(".LendXXX:\n");
     return;
   default:
