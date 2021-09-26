@@ -2,6 +2,7 @@
 
 TEMP_ASM="$(mktemp -u --suffix=.s)"
 TEMP_BIN="$(mktemp -u)"
+FAIL_COUNT=0
 
 trap cleanup EXIT
 
@@ -17,6 +18,7 @@ assert() {
     ./$BIN "$input" > "$TEMP_ASM"
     if [ $? -ne 0 ]; then
         echo "FAIL: $input => $expected failed to compile"
+        FAIL_COUNT=$(($FAIL_COUNT + 1))
         return
     fi
 
@@ -26,6 +28,7 @@ assert() {
 
     if [ "$actual" -ne "$expected" ]; then
         echo "FAIL: $input => $expected expected, but got $actual"
+        FAIL_COUNT=$(($FAIL_COUNT + 1))
         return
     fi
 
@@ -83,6 +86,10 @@ main() {
     assert 4 'if(0) return 5; return 4;'
     assert 5 'if(1) return 5; else return 4;'
     assert 4 'if(0) return 5; else return 4;'
+
+    if [ "$FAIL_COUNT" -ne 0 ]; then
+        exit 1;
+    fi
 }
 
 main
