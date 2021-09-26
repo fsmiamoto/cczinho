@@ -80,7 +80,7 @@ main() {
     assert 7 'return 7;';
     assert 5 'a=1; b=9; return 5*a;'
     assert 46 'a=1; b=9; return 5*b + a;'
-    assert 1 'a=1; return a == 1;'
+    assert 1 'a=1; return a == 1;' # FIXME
     assert 0 'a=1; return a == 0;'
     assert 5 'if(1) return 5; return 4;'
     assert 4 'if(0) return 5; return 4;'
