@@ -32,6 +32,10 @@ assert() {
         return
     fi
 
+    if [ "$VERBOSE" -eq 0 ];  then
+        return;
+    fi
+
     echo "PASS: $input => $actual"
 }
 
@@ -80,6 +84,9 @@ main() {
     assert 7 'return 7;';
     assert 5 'a=1; b=9; return 5*a;'
     assert 46 'a=1; b=9; return 5*b + a;'
+    assert 1 'a=5; return a >= 2;' 
+    assert 1 'a=5; return a < 6;' # FIXME
+    assert 0 'a=5; return a >= 6;' # FIXME
     assert 1 'a=1; return a == 1;' # FIXME
     assert 0 'a=1; return a == 0;'
     assert 5 'if(1) return 5; return 4;'
