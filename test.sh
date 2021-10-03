@@ -85,14 +85,16 @@ main() {
     assert 5 'a=1; b=9; return 5*a;'
     assert 46 'a=1; b=9; return 5*b + a;'
     assert 1 'a=5; return a >= 2;' 
-    assert 1 'a=5; return a < 6;' # FIXME
-    assert 0 'a=5; return a >= 6;' # FIXME
-    assert 1 'a=1; return a == 1;' # FIXME
+    assert 1 'a=5; return a < 6;'
+    assert 0 'a=5; return 35 >= 53;'
+    assert 1 'a=1; return a == 1;'
     assert 0 'a=1; return a == 0;'
     assert 5 'if(1) return 5; return 4;'
     assert 4 'if(0) return 5; return 4;'
     assert 5 'if(1) return 5; else return 4;'
     assert 4 'if(0) return 5; else return 4;'
+    assert 42 'a=123; if (a < 125) return 42; else return 27;'
+    assert 27 'a=256; if (a < 125) return 42; else return 27;'
 
     if [ "$FAIL_COUNT" -ne 0 ]; then
         exit 1;

@@ -16,8 +16,8 @@ struct LVar {
 LVar *locals = NULL;
 
 LVar *find_lvar(Token *tok) {
-  for (LVar *var = locals; var; var = var->next)
-    if (var->len == token->len && !memcmp(tok->str, var->name, var->len))
+  for (LVar *var = locals; var != NULL; var = var->next)
+    if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
       return var;
   return NULL;
 }
