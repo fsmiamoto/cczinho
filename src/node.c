@@ -46,6 +46,7 @@ void program() {
 
 // stmt = expr ";"
 // | "if" "(" expr ")" stmt ("else" stmt)?"
+// | "while" "(" expr ")" stmt"
 // | "return" expr ";"
 Node *stmt() {
   Node *node;
@@ -69,6 +70,16 @@ Node *stmt() {
     if ((tok = consume_token(TK_ELSE))) {
       node->els = stmt();
     }
+    return node;
+  }
+
+  if ((tok = consume_token(TK_WHILE))) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_WHILE;
+    expect("(");
+    node->cond = expr();
+    expect(")");
+    node->then = stmt();
     return node;
   }
 
