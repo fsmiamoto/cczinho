@@ -30,6 +30,8 @@ struct Node {
   Node *els;
   Node *cond;
   Node *then;
+  Node *init;
+  Node *incr;
   int val;
   int offset;
 };

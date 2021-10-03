@@ -102,6 +102,12 @@ main() {
     assert 3 'a = 5; while (a > 3) a=a-1; return a;'
     assert 5 'a = 5; while (0) a=a-1; return a;'
 
+    # for
+    assert 5 'a=0; for(a = 0; a < 5; a=a+1) 1; return a;'
+    assert 5 'a=0; for(a = 3; a < 5; a=a+1) 1; return a;'
+    assert 5 'a=0; for(a = 0; a < 5; 1) a=a+1; return a;'
+    assert 6 'a=0; for(a = 6; a < 5; 1) a=a+1; return a;'
+
     if [ "$FAIL_COUNT" -ne 0 ]; then
         exit 1;
     fi

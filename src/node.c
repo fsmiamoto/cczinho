@@ -47,6 +47,7 @@ void program() {
 // stmt = expr ";"
 // | "if" "(" expr ")" stmt ("else" stmt)?"
 // | "while" "(" expr ")" stmt"
+// | "for" "(" expr? ";" expr? ";" expr? ")" stmt
 // | "return" expr ";"
 Node *stmt() {
   Node *node;
@@ -78,6 +79,21 @@ Node *stmt() {
     node->kind = ND_WHILE;
     expect("(");
     node->cond = expr();
+    expect(")");
+    node->then = stmt();
+    return node;
+  }
+
+  // TODO: Implement expr?
+  if ((tok = consume_token(TK_FOR))) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_FOR;
+    expect("(");
+    node->init = expr();
+    expect(";");
+    node->cond = expr();
+    expect(";");
+    node->incr = expr();
     expect(")");
     node->then = stmt();
     return node;
