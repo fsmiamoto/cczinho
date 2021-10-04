@@ -84,17 +84,22 @@ Node *stmt() {
     return node;
   }
 
-  // TODO: Implement expr?
   if ((tok = consume_token(TK_FOR))) {
     node = calloc(1, sizeof(Node));
     node->kind = ND_FOR;
     expect("(");
-    node->init = expr();
-    expect(";");
-    node->cond = expr();
-    expect(";");
-    node->incr = expr();
-    expect(")");
+    if (!consume(";")) {
+      node->init = expr();
+      expect(";");
+    }
+    if (!consume(";")) {
+      node->cond = expr();
+      expect(";");
+    }
+    if (!consume(")")) {
+      node->incr = expr();
+      expect(")");
+    }
     node->then = stmt();
     return node;
   }

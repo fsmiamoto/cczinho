@@ -107,6 +107,8 @@ main() {
     assert 5 'a=0; for(a = 3; a < 5; a=a+1) 1; return a;'
     assert 5 'a=0; for(a = 0; a < 5; 1) a=a+1; return a;'
     assert 6 'a=0; for(a = 6; a < 5; 1) a=a+1; return a;'
+    assert 1 'a=0; for(;a == 0;) a=a+1; return a;'
+    assert 5 'a=0; for(a=5;;a=a+20) 1; return a;' #FIXME
 
     if [ "$FAIL_COUNT" -ne 0 ]; then
         exit 1;
