@@ -110,6 +110,11 @@ main() {
     assert 1 'a=0; for(;a == 0;) a=a+1; return a;'
     assert 5 'a=0; for(a=5;a == 2;a=a+20) 1; return a;'
 
+    assert 2 '{ a=2; } return a;'
+    assert 5 'a=5; if(1){} return a;'
+    assert 8 'a=0; if(1) { a=2; a=a*4; } return a;'
+    assert 4 'a=1; if(1) { b=1; b=2; b=a*4; } return b;'
+
     if [ "$FAIL_COUNT" -ne 0 ]; then
         exit 1;
     fi

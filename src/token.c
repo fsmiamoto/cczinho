@@ -93,7 +93,7 @@ Token *tokenize() {
       continue;
     }
 
-    if (strchr("+-*/()<>;=", *p)) {
+    if (strchr("+-*/()<>;={}", *p)) {
       curr = new_token(TK_RESERVED, curr, p++, 1);
       continue;
     }

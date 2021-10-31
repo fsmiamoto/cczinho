@@ -45,6 +45,7 @@ void program() {
 }
 
 // stmt = expr ";"
+// | "{" stmt* "}"
 // | "if" "(" expr ")" stmt ("else" stmt)?"
 // | "while" "(" expr ")" stmt"
 // | "for" "(" expr? ";" expr? ";" expr? ")" stmt
@@ -52,6 +53,18 @@ void program() {
 Node *stmt() {
   Node *node;
   Token *tok;
+
+  if (consume("{")) {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_BLOCK;
+    Node head = {};
+    Node *cur = &head;
+    while (!consume("}")) {
+      cur = cur->next = stmt();
+    }
+    node->body = head.next;
+    return node;
+  }
 
   if ((tok = consume_token(TK_RETURN))) {
     node = calloc(1, sizeof(Node));
