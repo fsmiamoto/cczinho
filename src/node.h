@@ -1,6 +1,8 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
+#include "token.h"
+
 typedef enum {
   ND_ADD, // +
   ND_SUB, // -
@@ -36,8 +38,7 @@ struct Node {
   Node *incr;
   Node *next;
   Node *body;
-  char * ident;
-  int ident_len;
+  Token* tok;
   int val;
   int offset;
 };

@@ -225,8 +225,7 @@ Node *primary() {
     if (consume("(")) {
       expect(")");
       node->kind = ND_CALL;
-      node->ident = tok->str;
-      node->ident_len = tok->len;
+      node->tok = tok;
       return node;
     }
 
