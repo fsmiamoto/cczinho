@@ -14,6 +14,7 @@ typedef enum {
   ND_GT,  // >
   ND_GTE, // >=
   ND_ASSIGN, // =
+  ND_CALL, // foo()
   ND_LVAR, // local variable
   ND_RETURN, // return
   ND_IF, // if
@@ -35,6 +36,8 @@ struct Node {
   Node *incr;
   Node *next;
   Node *body;
+  char * ident;
+  int ident_len;
   int val;
   int offset;
 };

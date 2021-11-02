@@ -2,6 +2,8 @@
 
 TEMP_ASM="$(mktemp -u --suffix=.s)"
 TEMP_BIN="$(mktemp -u)"
+TEMP_OBJ="$(mktemp -u)"
+TEMP_OUT="$(mktemp -u)"
 FAIL_COUNT=0
 
 trap cleanup EXIT
@@ -10,6 +12,12 @@ cleanup() {
     [ -e "$TEMP_BIN" ] && rm "$TEMP_BIN"
     [ -e "$TEMP_ASM" ] && rm "$TEMP_ASM"
 }
+
+setup() {
+    $CC -c ./test/functions.c -o $TEMP_OBJ
+}
+
+setup
 
 assert() {
     expected="$1"
@@ -22,12 +30,13 @@ assert() {
         return
     fi
 
-    $CC -o "$TEMP_BIN" "$TEMP_ASM"
-    "$TEMP_BIN"
+    $CC -o "$TEMP_BIN" "$TEMP_ASM" "$TEMP_OBJ"
+    "$TEMP_BIN" 2>&1 > "$TEMP_OUT"
     actual="$?"
 
     if [ "$actual" -ne "$expected" ]; then
         echo "FAIL: $input => $expected expected, but got $actual"
+        echo "OUTPUT: $(cat $TEMP_OUT)"
         FAIL_COUNT=$(($FAIL_COUNT + 1))
         return
     fi
@@ -114,6 +123,8 @@ main() {
     assert 5 'a=5; if(1){} return a;'
     assert 8 'a=0; if(1) { a=2; a=a*4; } return a;'
     assert 4 'a=1; if(1) { b=1; b=2; b=a*4; } return b;'
+
+    assert 5 'a=5; foo(); return a;'
 
     if [ "$FAIL_COUNT" -ne 0 ]; then
         exit 1;

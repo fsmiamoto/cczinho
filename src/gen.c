@@ -102,6 +102,9 @@ void gen(Node *node) {
         gen(n);
     }
     return;
+  case ND_CALL:
+    printf("  call %.*s\n", node->ident_len, node->ident);
+    return;
   default:
     break;
   }
