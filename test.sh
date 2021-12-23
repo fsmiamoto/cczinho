@@ -5,6 +5,7 @@ TEMP_BIN="$(mktemp -u)"
 TEMP_OBJ="$(mktemp -u)"
 TEMP_OUT="$(mktemp -u)"
 FAIL_COUNT=0
+PASS_COUNT=0
 
 trap cleanup EXIT
 
@@ -40,6 +41,8 @@ assert() {
         FAIL_COUNT=$(($FAIL_COUNT + 1))
         return
     fi
+
+    PASS_COUNT=$(($PASS_COUNT + 1))
 
     if [ "$VERBOSE" -eq 0 ];  then
         return;
@@ -124,9 +127,12 @@ main() {
     assert 8 'a=0; if(1) { a=2; a=a*4; } return a;'
     assert 4 'a=1; if(1) { b=1; b=2; b=a*4; } return b;'
 
-    assert 5 'a=5; foo(); return a;'
+    assert 5 'a=6; foo(); return a;'
+
+    echo "PASS - $PASS_COUNT tests"
 
     if [ "$FAIL_COUNT" -ne 0 ]; then
+        echo "FAIL - $FAIL_COUNT tests"
         exit 1;
     fi
 }
