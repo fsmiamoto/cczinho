@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+static char *registers[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
 static int count(void) {
   static int i = 1;
   return i++;
@@ -16,6 +18,8 @@ void gen_lval(Node *node) {
   printf("  sub rax, %d\n", node->offset);
   printf("  push rax\n");
 }
+
+static void push(void) { printf("  push rax\n"); }
 
 void gen(Node *node) {
   if (!node)
@@ -102,9 +106,30 @@ void gen(Node *node) {
         gen(n);
     }
     return;
-  case ND_CALL:
+  case ND_FUNCALL: {
+    int nargs = 0;
+
+    for (Node *arg = node->args; arg; arg = arg->next) {
+      gen(arg);
+      nargs++;
+    }
+
+    if (nargs > 6) {
+      error("cannot call function with more than 6 arguments");
+    }
+
+    for (int n = nargs - 1; n >= 0; n--) {
+      printf("  pop %s\n", registers[n]);
+    }
+
+    printf("  mov rax, 0\n");
     printf("  call %.*s\n", node->tok->len, node->tok->str);
+    // FIXME: Currently we need this extra push, because somewhere we are making
+    // an extra pop
+    push();
+
     return;
+  }
   default:
     break;
   }

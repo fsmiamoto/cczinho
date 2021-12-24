@@ -9,13 +9,24 @@ PASS_COUNT=0
 
 trap cleanup EXIT
 
+# set -ex
+
 cleanup() {
     [ -e "$TEMP_BIN" ] && rm "$TEMP_BIN"
     [ -e "$TEMP_ASM" ] && rm "$TEMP_ASM"
 }
 
 setup() {
-    $CC -c ./test/functions.c -o $TEMP_OBJ
+    # $CC -c ./test/functions.c -o $TEMP_OBJ
+    cat <<EOF | $CC -xc -c -o $TEMP_OBJ -
+int ret3() { return 3; }
+int ret5() { return 5; }
+int add(int x, int y) { return x+y; }
+int sub(int x, int y) { return x-y; }
+int add6(int a, int b, int c, int d, int e, int f) {
+  return a+b+c+d+e+f;
+}
+EOF
 }
 
 setup
@@ -127,7 +138,13 @@ main() {
     assert 8 'a=0; if(1) { a=2; a=a*4; } return a;'
     assert 4 'a=1; if(1) { b=1; b=2; b=a*4; } return b;'
 
-    assert 5 'a=6; foo(); return a;'
+    assert 5 'return ret5();'
+    assert 3 'return ret3();'
+
+    assert 15 'return add(10,5);'
+    assert 5 'return sub(10,5);'
+
+    assert 21 'return add6(1,2,3,4,5,6);'
 
     echo "PASS - $PASS_COUNT tests"
 

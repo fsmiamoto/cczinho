@@ -16,7 +16,7 @@ typedef enum {
   ND_GT,  // >
   ND_GTE, // >=
   ND_ASSIGN, // =
-  ND_CALL, // foo()
+  ND_FUNCALL, // foo()
   ND_LVAR, // local variable
   ND_RETURN, // return
   ND_IF, // if
@@ -29,16 +29,26 @@ typedef struct Node Node;
 
 struct Node {
   NodeKind kind;
+
   Node *lhs;
   Node *rhs;
-  Node *els;
+
+  // conditional
   Node *cond;
   Node *then;
+  Node *els; // else branch
+
   Node *init;
   Node *incr;
+
   Node *next;
+
   Node *body;
   Token* tok;
+
+  // function call
+  Node *args;
+
   int val;
   int offset;
 };

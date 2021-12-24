@@ -209,7 +209,7 @@ Node *unary() {
 
 // primary =
 // | num
-// | ident ( "(" ")")?
+// | ident ( "(" (expr(,expr)*)? ")")?
 // | "(" expr ")"
 Node *primary() {
   if (consume("(")) {
@@ -223,9 +223,24 @@ Node *primary() {
     Node *node = calloc(1, sizeof(Node));
 
     if (consume("(")) {
-      expect(")");
-      node->kind = ND_CALL;
+      node->kind = ND_FUNCALL;
       node->tok = tok;
+
+      if (consume(")"))
+        // no arguments
+        return node;
+
+      Node *head = expr();
+
+      Node *current = head;
+
+      while (!consume(")")) {
+        consume(",");
+        current = current->next = expr();
+      }
+
+      node->args = head;
+
       return node;
     }
 
