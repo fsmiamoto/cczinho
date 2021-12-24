@@ -9,15 +9,13 @@ PASS_COUNT=0
 
 trap cleanup EXIT
 
-# set -ex
-
 cleanup() {
     [ -e "$TEMP_BIN" ] && rm "$TEMP_BIN"
     [ -e "$TEMP_ASM" ] && rm "$TEMP_ASM"
 }
 
 setup() {
-    # $CC -c ./test/functions.c -o $TEMP_OBJ
+    # simple functions to be linked against for testing
     cat <<EOF | $CC -xc -c -o $TEMP_OBJ -
 int ret3() { return 3; }
 int ret5() { return 5; }
@@ -138,6 +136,7 @@ main() {
     assert 8 'a=0; if(1) { a=2; a=a*4; } return a;'
     assert 4 'a=1; if(1) { b=1; b=2; b=a*4; } return b;'
 
+    # function calls
     assert 5 'return ret5();'
     assert 3 'return ret3();'
 
