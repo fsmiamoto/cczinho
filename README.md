@@ -5,7 +5,7 @@ My implementation of the compiler built at https://www.sigbus.info/compilerbook 
 
 ## Running the tests
 ```sh
-$ make test VERBOSE=true
+$ make test VERBOSE=1
 ```
 
 ## Current step
